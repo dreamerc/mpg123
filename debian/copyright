@@ -1,0 +1,66 @@
+This package was first debianized by Paul Haggart <phaggart@debian.org> on
+Sun, 27 Apr 1997 15:09:37 -0400.
+
+It was downloaded from: http://www.mpg123.de/download/
+
+Upstream authors: Michael Hipp <hippm@informatik.uni-tuebingen.de>
+                  Oliver Fromme <oliver.fromme@heim3.tu-clausthal.de>
+		  Thomas Orgis <thomas@orgis.org>
+		  Nicholas J Humfrey <njh@ecs.soton.ac.uk>
+
+Copyright:	(c) 1995-2006 by the mpg123 project (Michael Hipp,
+                    Oliver Fromme, Thomas Orgis, Nicholas J Humfrey,
+		    and contributors)
+
+		    "free software under the terms of the LGPL 2.1"
+
+The following clarification is taken verbatim from the file COPYING in the
+source distribution:
+
+	Code is copyrighted by Michael Hipp, who made it free software under
+	the terms of the LGPL 2.1.
+
+	But that is not all of it.  mpg123 is licensed under the GNU General
+	Lesser Public License, version 2.1, and in parts under the GNU General
+	Public License, version 2.  That means that _all_ of mpg123 is licensed
+	under GPL and the major part also under the LGPL.
+
+	Actually, the "major part" currently is the whole distributed package
+	of mpg123. There are some files (old alsa output, libao output) that
+	you get from our svn repository and that do not fall under LGPL.
+
+	When the copyright marker in a source file says "the mpg123 project"
+	that means that the file contains code copyrighted by contributors to
+	mpg123, the "initially written by" naming the person(s) that created
+	the file and thus may have the largest part of copyrights on it.  I am
+	explaining this here to emphasize that the copyright always actually
+	lies by the individual member (i.e. contributor to) of the mpg123
+	project who wrote a specific section of code.  Usage of a source code
+	management system like Subversion should provide keeping track of
+	individual copyright traces...
+
+	Please consider that any code that is contributed to the mpg123 project
+	shall be licensed under LGPL 2.1 .  If you want to contribute, but
+	don't agree to that (i.e. you want to have your code GPL only) please
+	say so - then, we either you convince is to include your code under
+	GPL, we convince you to make it LGPL instead or, as a last resort,
+	you'll have to do you own GPLed fork.  But we should try to avoid the
+	last option...
+
+	All files in the distribution that don't carry a license note on their
+	own are licensed under the terms of the LGPL 2.1; all files that do
+	carry either a LGPL or GPL note are licensed respectively under the
+	LGPL or GPL as follows:
+	
+	(...)
+
+where the complete texts of the GNU General Public License (GPL) version 2 and
+the GNU Lesser General Public License (LGPL) version 2.1 have been omitted here
+for brevity.  On any Debian GNU/Linux system, they can be found in
+`/usr/share/common-licenses/GPL-2', and '/usr/share/common-licenses/LGPL-2.1',
+respectively.
+
+Earlier versions of mpg123 were distributed under a license that did not meet
+Debian's free software guidelines.  Details on the relicensing process can
+be found in the file ROAD_TO_LGPL that is part of mpg123's source distribution.
+It is located in the 'doc' subdirectory.

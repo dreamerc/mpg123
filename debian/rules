@@ -1,0 +1,187 @@
+#!/usr/bin/make -f
+
+PACKAGE:=mpg123
+
+ARCH:=$(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+OS:=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+CPU:=$(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+
+WRAPPER_TARGETS:=mpg123-oss mpg123-esd mpg123-nas
+
+ifeq ($(ARCH),i486)
+WRAPPER_TARGETS += mpg123-oss-i486
+endif
+
+ifeq ($(OS),linux)
+WRAPPER_TARGETS += mpg123-alsa
+endif
+
+CONF_COMMON:=--prefix=/usr --enable-static --enable-shared --disable-ltdl-install
+
+CONF_i486:=--with-cpu=x86_dither
+CONF_arm:=--with-cpu=generic_nofpu
+
+SOVERSION:=0
+LIB_PKG:=libmpg123-$(SOVERSION)
+DEV_PKG:=libmpg123-dev
+LIB_PKGSTR:=-p$(LIB_PKG) -p$(DEV_PKG)
+ARCH_PKGSTR=-pmpg123
+ALL_PKGSTR=$(LIB_PKGSTR) $(ARCH_PKGSTR)
+
+DUMMY_PKGSTR=-pmpg123-esd -pmpg123-nas
+ifeq ($(OS),linux)
+DUMMY_PKGSTR += -pmpg123-alsa
+ifeq ($(ARCH),i486)
+DUMMY_PKGSTR += -pmpg123-oss-3dnow -pmpg123-oss-i486
+endif
+else
+ifeq ($(OS),kfreebsd)
+ifeq ($(ARCH),i486)
+DUMMY_PKGSTR += -pmpg123-oss-i486
+endif
+endif
+endif
+
+CFLAGS = 
+LDFLAGS =
+
+# Add hardening options. OS and architecture restrictions are stolen from
+# package hardening-wrapper.
+ifeq (,$(findstring noharden,$(DEB_BUILD_OPTIONS)))
+# configure script currently chokes on -Werror
+#       CFLAGS += -Wformat -Werror=format-security
+        CFLAGS += -Wformat
+        LDFLAGS += -Wl,-z,relro
+ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -D_FORTIFY_SOURCE=2
+endif
+ifeq (,$(findstring :$(CPU):,:ia64:alpha:mips:mipsel:hppa:arm:))
+        CFLAGS += -fstack-protector
+endif
+ifneq (,$(findstring :$(OS):,:linux:knetbsd:))
+ifeq (,$(findstring :$(CPU):,:hppa:m68k:arm:mips:mipsel:))
+        CFLAGS += -fPIE
+        LDFLAGS += -pie
+endif
+endif
+endif
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -O0
+else
+        CFLAGS += -O2
+endif
+
+
+#export DH_VERBOSE=1
+
+mpg123: $(WRAPPER_TARGETS)
+	dh_testdir
+
+	$(MAKE)
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	mv $(CURDIR)/debian/tmp/usr/bin/mpg123 \
+	   $(CURDIR)/debian/tmp/usr/bin/mpg123.bin
+	mv $(CURDIR)/debian/tmp/usr/share/man/man1/mpg123.1 \
+	   $(CURDIR)/debian/tmp/usr/share/man/man1/mpg123.bin.1
+	install $(WRAPPER_TARGETS) $(CURDIR)/debian/tmp/usr/bin/
+	for i in $(WRAPPER_TARGETS); do \
+		install debian/mpg123-wrapper.1 \
+		        $(CURDIR)/debian/tmp/usr/share/man/man1/$$i.1; \
+	done
+
+mpg123-%: debian/mpg123-wrapper.in
+	dh_testdir
+	o=`echo $@ | sed -e 's/^mpg123-\([^-]\+\).*/\1/'`; \
+	sed -e "s/@OUTPUT@/$$o/g" < debian/mpg123-wrapper.in > $@
+
+build: build-stamp
+build-stamp: configure mpg123
+	touch build-stamp
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+
+	if test -f "$(CURDIR)/build/config.sub"; then \
+		mv "$(CURDIR)/build/config.sub" "$(CURDIR)/debian/"; \
+	fi
+	if test -f "$(CURDIR)/build/config.guess"; then \
+		mv "$(CURDIR)/build/config.guess" "$(CURDIR)/debian/"; \
+	fi
+
+	ln -sf /usr/share/misc/config.sub "$(CURDIR)/build/"
+	ln -sf /usr/share/misc/config.guess "$(CURDIR)/build/"
+
+	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
+	  ./configure $(CONF_COMMON) $(CONF_$(ARCH)) || \
+	    { ret=$?; cat config.log; exit $$ret; }
+
+	touch configure-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	-rm -f build-stamp configure-stamp
+	-rm -f $(WRAPPER_TARGETS)
+	test ! -f Makefile || $(MAKE) distclean
+
+	if test -L "$(CURDIR)/build/config.sub"; then \
+		rm -f "$(CURDIR)/build/config.sub"; \
+		if test -e "$(CURDIR)/debian/config.sub"; then \
+			mv "$(CURDIR)/debian/config.sub" "$(CURDIR)/build/"; \
+		fi; \
+	fi
+	if test -L "$(CURDIR)/build/config.guess"; then \
+		rm -f "$(CURDIR)/build/config.guess"; \
+		if test -e "$(CURDIR)/debian/config.guess"; then \
+			mv "$(CURDIR)/debian/config.guess" "$(CURDIR)/build/"; \
+		fi; \
+	fi
+
+	dh_clean
+
+binary-indep: build
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_install $(ALL_PKGSTR)
+	dh_installdocs $(LIB_PKGSTR) $(DUMMY_PKGSTR)
+	dh_installdocs $(ARCH_PKGSTR) -A \
+	               README AUTHORS doc/BENCHMARKING doc/CONTACT \
+	               doc/README.gain doc/README.remote doc/THANKS 
+	dh_installexamples $(LIB_PKGSTR)
+	dh_installman $(ARCH_PKGSTR)
+	dh_installchangelogs $(DUMMY_PKGSTR)
+	dh_installchangelogs $(ARCH_PKGSTR) NEWS
+	dh_installchangelogs $(LIB_PKGSTR) NEWS.libmpg123
+	dh_installmime $(ARCH_PKGSTR)
+	dh_strip $(ALL_PKGSTR)
+	dh_compress $(ALL_PKGSTR) $(DUMMY_PKGSTR)
+	dh_fixperms $(ALL_PKGSTR) $(DUMMY_PKGSTR)
+	dh_makeshlibs $(LIB_PKGSTR) -V "$(LIB_PKG) (>= 1.7.2)"
+	dh_installdeb $(ALL_PKGSTR)
+	dh_shlibdeps $(ALL_PKGSTR) -Xdebian/mpg123/usr/lib/mpg123/ -- \
+		-dSuggests `find debian/mpg123/usr/lib/mpg123/ -name "output_*.so" -type f` -dDepends
+	for n in alsa dummy esd nas oss; do \
+		i="debian/mpg123/usr/lib/mpg123/output_$$n.so"; \
+		test -e "$$i" || continue; \
+		dh_shlibdeps $(ARCH_PKGSTR) $(DUMMY_PKGSTR) -Xdebian/mpg123/usr/lib/mpg123 debian/mpg123 -- -p"$$n"plugin -dRecommends "$$i" -dDepends; \
+	done
+	chmod +x "$(CURDIR)/debian/alt_deps.py"
+	"$(CURDIR)/debian/alt_deps.py" "$(CURDIR)/debian/mpg123.substvars" \
+	  plugin:Recommends \
+	  "alsaplugin:Recommends ossplugin:Recommends dummyplugin:Recommends" \
+	  ossplugin:Recommends=oss-compat
+	dh_gencontrol $(ALL_PKGSTR)
+	dh_gencontrol $(DUMMY_PKGSTR) -- -Tdebian/mpg123.substvars
+	dh_md5sums $(ALL_PKGSTR) $(DUMMY_PKGSTR)
+	dh_builddeb $(ALL_PKGSTR) $(DUMMY_PKGSTR)
+
+binary-arch: build install
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean configure install binary binary-arch binary-indep

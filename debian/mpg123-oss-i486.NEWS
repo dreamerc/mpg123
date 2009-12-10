@@ -1,0 +1,10 @@
+mpg123-oss-i486 (1.4.3-1) unstable; urgency=low
+
+  * As of this version, an i486-optimised build is no longer provided as a
+    binary Debian package to limit the number of packaging flavours. Instead,
+    i486 will now use generic optimisations only, and mpg123-oss-i486 serves
+    as an empty dummy package that can be safely removed after an upgrade.
+    i486-specific optimisations are still available in the original source
+    distribution of mpg123 using configure flag --with-cpu=i486.
+
+ -- Daniel Kobras <kobras@debian.org>  Sun, 15 Jun 2008 19:08:20 +0200

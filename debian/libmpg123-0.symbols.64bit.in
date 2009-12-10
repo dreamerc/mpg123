@@ -1,0 +1,15 @@
+ mpg123_decode_frame@Base 1.6.2
+ mpg123_feedseek@Base 1.6.2
+ mpg123_index@Base 1.6.2
+ mpg123_length@Base 1.6.2
+ mpg123_open@Base 1.6.2
+ mpg123_open_fd@Base 1.6.2
+ mpg123_position@Base 1.6.2
+ mpg123_seek@Base 1.6.2
+ mpg123_seek_frame@Base 1.6.2
+ mpg123_set_filesize@Base 1.6.2
+ mpg123_set_index@Base 1.10.0
+ mpg123_tell@Base 1.6.2
+ mpg123_tellframe@Base 1.6.2
+ mpg123_tell_stream@Base 1.6.2
+ mpg123_timeframe@Base 1.6.2

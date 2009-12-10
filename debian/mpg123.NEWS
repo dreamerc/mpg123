@@ -1,0 +1,9 @@
+mpg123 (1.4.3-1) unstable; urgency=low
+
+  * mpg123 now supports a plugin architecture to select different output
+    mechanisms at runtime, using option -o. The OSS output plugin
+    can be accessed with "mpg123 -o oss". A wrapper skript mpg123-oss is
+    provided with this package mpg123 for backward compatibility, but it is
+    likely to be removed in the next release cycle.
+
+ -- Daniel Kobras <kobras@debian.org>  Sun, 15 Jun 2008 19:18:22 +0200

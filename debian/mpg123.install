@@ -1,0 +1,5 @@
+debian/tmp/usr/bin/*
+debian/tmp/usr/share/man/*/*
+debian/tmp/usr/lib/mpg123/*.la
+debian/tmp/usr/lib/mpg123/*.so
+

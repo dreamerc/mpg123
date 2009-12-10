@@ -1,0 +1,18 @@
+#!/bin/sh -e
+
+case "$1" in
+	upgrade)
+		update-alternatives --remove mpg123 /usr/bin/mpg123-oss-3dnow
+		update-alternatives --remove mp3-decoder \
+			/usr/bin/mpg123-oss-3dnow
+		;;
+	install|abort-upgrade)
+		;;
+	*)
+		echo "$0 called with unknown argument '$1'" >&2
+		exit 1
+		;;
+esac
+
+#DEBHELPER#
+

@@ -1,3 +1,10 @@
+mpg123 (1.10.0-2~bpo50+1) lenny-backports; urgency=low
+
+  * Non-maintainer upload.
+  * Backport.
+
+ -- Shan-Bin Chen <dreamerwolf.tw@gmail.com>  Thu, 14 Jan 2010 05:23:09 +0800
+
 mpg123 (1.10.0-2) unstable; urgency=low
 
   * src/libmpg123/dither.[hc]: Disable function mpg123_noise that is not
